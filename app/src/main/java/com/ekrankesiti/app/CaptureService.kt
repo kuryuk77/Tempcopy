@@ -1,6 +1,5 @@
 package com.ekrankesiti.app
 
-import android.accessibilityservice.AccessibilityButtonController
 import android.accessibilityservice.AccessibilityService
 import android.content.Intent
 import android.graphics.Bitmap
@@ -25,21 +24,12 @@ class CaptureService : AccessibilityService() {
     private val handler = Handler(Looper.getMainLooper())
     private var busy = false
 
-    private val buttonCallback =
-        object : AccessibilityButtonController.AccessibilityButtonCallback() {
-            override fun onClicked(controller: AccessibilityButtonController) {
-                capture(250)
-            }
-        }
-
     override fun onServiceConnected() {
         super.onServiceConnected()
         instance = this
-        accessibilityButtonController.registerAccessibilityButtonCallback(buttonCallback)
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
-        accessibilityButtonController.unregisterAccessibilityButtonCallback(buttonCallback)
         instance = null
         return super.onUnbind(intent)
     }

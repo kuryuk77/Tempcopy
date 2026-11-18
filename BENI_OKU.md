@@ -17,7 +17,7 @@ Ekranın bir bölümünü seçip **galeriye kaydetmeden panoya kopyalar**.
 ## Kullanım
 Kontrol panelinden **Ekran Kesiti** düğmesine basın → alanı çizin → **Kopyala**.
 Köşelerden boyutlandırabilir, içinden tutup taşıyabilirsiniz.
-Alternatif tetik: Erişilebilirlik ayarında servisin **kısayolunu** açarsanız erişilebilirlik düğmesi / hareketiyle de çalışır.
+
 
 ## Notlar
 - Kopyalanan görsel uygulamanın gizli önbelleğinde durur, 24 saat sonra silinir.
