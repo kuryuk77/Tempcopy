@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Ekran Kesiti</string>
+    <string name="a11y_desc">Hızlı ayar düğmesine bastığınızda ekran görüntüsü alır. Seçtiğiniz alanı galeriye kaydetmeden panoya kopyalar. Başka hiçbir veri okumaz.</string>
+</resources>
