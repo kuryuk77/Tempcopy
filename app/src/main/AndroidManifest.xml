@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
+        android:name=".App"
         android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -24,6 +25,14 @@
             android:screenOrientation="locked"
             android:taskAffinity="com.ekrankesiti.app.crop"
             android:theme="@style/CropTheme" />
+
+        <activity
+            android:name=".TriggerActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:noHistory="true"
+            android:taskAffinity="com.ekrankesiti.app.trigger"
+            android:theme="@style/TriggerTheme" />
 
         <service
             android:name=".CaptureService"

@@ -2,6 +2,9 @@ package com.ekrankesiti.app
 
 import android.app.Activity
 import android.app.StatusBarManager
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.view.View
 import android.content.ComponentName
 import android.content.Intent
 import android.graphics.Typeface
@@ -21,6 +24,8 @@ import kotlin.math.roundToInt
 class MainActivity : Activity() {
 
     private lateinit var status: TextView
+    private lateinit var crashBox: LinearLayout
+    private lateinit var crashText: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +57,33 @@ class MainActivity : Activity() {
             )
         })
 
+        crashBox = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(0, dp(20), 0, 0)
+        }
+        crashText = TextView(this).apply {
+            textSize = 12f
+            setTextIsSelectable(true)
+            setTextColor(0xFFFF6B6B.toInt())
+        }
+        crashBox.addView(TextView(this).apply {
+            text = "Son hata kaydı"
+            textSize = 16f
+            setTypeface(typeface, Typeface.BOLD)
+        })
+        crashBox.addView(crashText)
+        crashBox.addView(button("Hata kaydını kopyala") {
+            val t = CrashLog.read(this) ?: return@button
+            getSystemService(ClipboardManager::class.java)
+                .setPrimaryClip(ClipData.newPlainText("Hata", t))
+            toast("Kopyalandı. Claude'a yapıştırın.")
+        })
+        crashBox.addView(button("Hata kaydını sil") {
+            CrashLog.clear(this)
+            refresh()
+        })
+        col.addView(crashBox)
+
         col.addView(TextView(this).apply {
             textSize = 15f
             setPadding(0, dp(20), 0, 0)
@@ -63,10 +95,18 @@ class MainActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
-        status.text = if (CaptureService.instance != null)
+        refresh()
+    }
+
+    private fun refresh() {
+        status.text = (if (CaptureService.instance != null)
             "✅ Servis açık. Hazır."
         else
-            "⚠️ Servis kapalı. Önce 1. adımı yapın."
+            "⚠️ Servis kapalı. Önce 1. adımı yapın.") +
+            "\nSürüm " + BuildConfig.VERSION_NAME
+        val crash = CrashLog.read(this)
+        crashBox.visibility = if (crash == null) View.GONE else View.VISIBLE
+        crashText.text = crash ?: ""
     }
 
     private fun addTile() {

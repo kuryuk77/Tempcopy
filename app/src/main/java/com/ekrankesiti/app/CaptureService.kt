@@ -51,36 +51,54 @@ class CaptureService : AccessibilityService() {
     }
 
     private fun takeShot() {
-        takeScreenshot(
-            Display.DEFAULT_DISPLAY,
-            mainExecutor,
-            object : AccessibilityService.TakeScreenshotCallback {
-                override fun onSuccess(result: AccessibilityService.ScreenshotResult) {
-                    val buffer = result.hardwareBuffer
-                    val hw = Bitmap.wrapHardwareBuffer(buffer, result.colorSpace)
-                    val bmp = hw?.copy(Bitmap.Config.ARGB_8888, false)
-                    hw?.recycle()
-                    buffer.close()
-                    busy = false
-                    if (bmp == null) {
-                        toast("Ekran görüntüsü alınamadı")
-                        return
+        try {
+            takeScreenshot(
+                Display.DEFAULT_DISPLAY,
+                mainExecutor,
+                object : AccessibilityService.TakeScreenshotCallback {
+                    override fun onSuccess(result: AccessibilityService.ScreenshotResult) {
+                        try {
+                            handleShot(result)
+                        } catch (e: Throwable) {
+                            fail(e)
+                        }
                     }
-                    ShotHolder.bitmap = bmp
-                    val i = Intent(this@CaptureService, CropActivity::class.java).addFlags(
-                        Intent.FLAG_ACTIVITY_NEW_TASK or
-                            Intent.FLAG_ACTIVITY_CLEAR_TASK or
-                            Intent.FLAG_ACTIVITY_NO_ANIMATION
-                    )
-                    startActivity(i)
-                }
 
-                override fun onFailure(errorCode: Int) {
-                    busy = false
-                    toast("Ekran görüntüsü alınamadı (kod $errorCode)")
+                    override fun onFailure(errorCode: Int) {
+                        busy = false
+                        toast("Ekran görüntüsü alınamadı (kod $errorCode)")
+                    }
                 }
-            }
+            )
+        } catch (e: Throwable) {
+            fail(e)
+        }
+    }
+
+    private fun handleShot(result: AccessibilityService.ScreenshotResult) {
+        val buffer = result.hardwareBuffer
+        val hw = Bitmap.wrapHardwareBuffer(buffer, result.colorSpace)
+        val bmp = hw?.copy(Bitmap.Config.ARGB_8888, false)
+        hw?.recycle()
+        buffer.close()
+        busy = false
+        if (bmp == null) {
+            toast("Ekran görüntüsü alınamadı")
+            return
+        }
+        ShotHolder.bitmap = bmp
+        val i = Intent(this, CropActivity::class.java).addFlags(
+            Intent.FLAG_ACTIVITY_NEW_TASK or
+                Intent.FLAG_ACTIVITY_CLEAR_TASK or
+                Intent.FLAG_ACTIVITY_NO_ANIMATION
         )
+        startActivity(i)
+    }
+
+    private fun fail(e: Throwable) {
+        busy = false
+        CrashLog.save(this, e)
+        toast("Hata: ${e.javaClass.simpleName}. Ayrıntı uygulamada.")
     }
 
     private fun toast(msg: String) =

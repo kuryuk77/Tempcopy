@@ -6,7 +6,7 @@ import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 
-/** Bildirim panelindeki "Ekran Kesiti" düğmesi. */
+/** Kontrol panelindeki "Ekran Kesiti" düğmesi. */
 class CaptureTileService : TileService() {
 
     override fun onStartListening() {
@@ -19,21 +19,12 @@ class CaptureTileService : TileService() {
 
     override fun onClick() {
         super.onClick()
-        val svc = CaptureService.instance
-        if (svc != null) {
-            // Panelin kapanma animasyonu için bekleme süresi.
-            svc.capture(600)
-        } else {
-            openMain()
-        }
-    }
-
-    private fun openMain() {
-        val intent = Intent(this, MainActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        // Görünmez ara ekranı açıp paneli sistem tarafından kapattırır.
+        val intent = Intent(this, TriggerActivity::class.java)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION)
         if (Build.VERSION.SDK_INT >= 34) {
             val pi = PendingIntent.getActivity(
-                this, 0, intent,
+                this, 1, intent,
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             )
             startActivityAndCollapse(pi)
